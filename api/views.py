@@ -149,7 +149,7 @@ def handle_payment(request, level):
         return {
             "Message": "Please enter your mobile money phone number",
             "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, user_name, constituency, payment_option),
-            "Type": RELEASE_USSD
+            "Type": RESPONSE_USSD
         }
 
     if level == 5:
