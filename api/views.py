@@ -64,7 +64,7 @@ def request_payment(mobile_number, amount, constituency, network):
                             json=request_body,
                             headers=headers)
 
-        print("Request made %d %s" % (res.status_code, response.text, ))
+        print("Request made %d %s" % (res.status_code, res.text, ))
 
     else:
         print("Failed %d" % response.status_code)
