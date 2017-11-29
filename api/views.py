@@ -166,7 +166,7 @@ def handle_payment(request, level):
         }
 
     if level == 5:
-        mobile_number = "0" + request.data.get(MESSAGE)[3:]
+        mobile_number = request.data.get(MESSAGE)
 
         payment_option = request.data.get(CLIENT_STATE).split(":")[4]
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
