@@ -35,7 +35,9 @@ def request_payment(mobile_number, amount, constituency, network):
                              data={"mobileNumber": "0000000006",
                                    "password": "memberReg#Newdeveloper5"})
 
+    print("[Request Payment] Authenticating...")
     if str(response.status_code).startswith("20"):
+        print("Authentication done, success")
         json_response = response.json()
         access_token = json_response['access_token']
 
@@ -56,6 +58,9 @@ def request_payment(mobile_number, amount, constituency, network):
         requests.post("https://payment.mypayutil.com/api/merchants/payments/%s" % network,
                       data=request_body,
                       headers=headers)
+
+    else:
+        print("Failed %d" % response.status_code)
 
 
 def handle_registration(request, level):
