@@ -24,8 +24,69 @@ invalid_option_data = {
 }
 
 
+def create_member(user_name, constituency,
+                  user_id_type, user_id):
+    return True
+
+
 def handle_registration(request, level):
-    pass
+    state_branch = 1
+    next_level = int(level) + 1
+
+    if level == 1:
+        return {
+            "Message": "Please enter your name (First and last name)",
+            "ClientState": "%d:%d" % (state_branch, next_level),
+            "Type": RESPONSE_USSD
+        }
+
+    # the person has provided name
+    if level == 2:
+        user_name = request.data.get(MESSAGE)
+        return {
+            "Message": "Please enter you constituency",
+            "ClientState": "%d:%d:%s" % (state_branch, next_level, user_name),
+            "Type": RESPONSE_USSD
+        }
+
+    # the person has provided constituency
+    if level == 3:
+        constituency = request.data.get(MESSAGE)
+        user_name = request.data.get(CLIENT_STATE).split(":")[2]
+        return {
+            "Message": "Please select a ID type.\n\n1. Voter's ID\n2. Membership ID",
+            "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_name, constituency),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 4:
+        user_id_type = request.data.get(MESSAGE)
+        constituency = request.data.get(CLIENT_STATE).split(":")[3]
+        user_name = request.data.get(CLIENT_STATE).split(":")[2]
+
+        return {
+            "Message": "Please enter your ID Number",
+            "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, user_name, constituency, user_id_type),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 5:
+        user_id = request.data.get(MESSAGE)
+        user_id_type = request.data.get(CLIENT_STATE).split(":")[4]
+        constituency = request.data.get(CLIENT_STATE).split(":")[3]
+        user_name = request.data.get(CLIENT_STATE).split(":")[2]
+
+        if create_member(user_name, constituency, user_id_type, user_id):
+            return {
+                "Message": "Dear %s, you have been registered as a member successfully. " % user_name,
+                "Type": RELEASE_USSD
+            }
+
+        else:
+            return {
+                "Message": "A member has already been registered with the ID you provided.",
+                "Type": RELEASE_USSD
+            }
 
 
 def handle_payment(request, level):
