@@ -54,13 +54,14 @@ def request_payment(mobile_number, amount, constituency, network):
         }
 
         print(request_body)
+        print(network)
 
         headers = {
             "Authorization": "Bearer %s" % access_token
         }
 
         res = requests.post("https://payment.mypayutil.com/api/merchants/payments/%s" % network,
-                            data=request_body,
+                            json=request_body,
                             headers=headers)
 
         print("Request made %d %s" % (res.status_code, response.text, ))
