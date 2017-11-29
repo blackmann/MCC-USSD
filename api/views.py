@@ -24,81 +24,39 @@ invalid_option_data = {
 }
 
 
-def create_member(user_name, constituency,
-                  user_id_type, user_id):
-    """
-
-    :param user_name:
-    :param constituency:
-    :param user_id_type: is the position in the menu for id type
-    :param user_id:
-    :return:
-    """
-    actual_id_type = ["Voters", "Member ID"][int(user_id_type) - 1]
-    member_exists = Member.objects.filter(id_type=actual_id_type,
-                                          member_id=user_id).exists()
-
-    if not member_exists:
-        Member.objects.create(name=user_name,
-                              id_type=actual_id_type,
-                              member_id=user_id,
-                              constituency=constituency)
-
-    return Member.objects.filter(id_type=actual_id_type,
-                                 member_id=user_id).first()
+def check_validity(mobile_number):
+    return False
 
 
 def handle_registration(request, level):
     state_branch = 1
     next_level = int(level) + 1
 
+    # the person has provided constituency
     if level == 1:
         return {
-            "Message": "Please enter your name (First and last name)",
-            "ClientState": "%d:%d" % (state_branch, next_level),
-            "Type": RESPONSE_USSD
-        }
-
-    # the person has provided name
-    if level == 2:
-        user_name = request.data.get(MESSAGE)
-        return {
-            "Message": "Please enter you constituency",
-            "ClientState": "%d:%d:%s" % (state_branch, next_level, user_name),
-            "Type": RESPONSE_USSD
-        }
-
-    # the person has provided constituency
-    if level == 3:
-        constituency = request.data.get(MESSAGE)
-        user_name = request.data.get(CLIENT_STATE).split(":")[2]
-        return {
             "Message": "Please select a ID type.\n\n1. Voter's ID\n2. Membership ID",
-            "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_name, constituency),
+            "ClientState": "%d:%d" % (state_branch, next_level,),
             "Type": RESPONSE_USSD
         }
 
-    if level == 4:
+    if level == 2:
         user_id_type = request.data.get(MESSAGE)
-        constituency = request.data.get(CLIENT_STATE).split(":")[3]
-        user_name = request.data.get(CLIENT_STATE).split(":")[2]
 
         return {
             "Message": "Please enter your ID Number",
-            "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, user_name, constituency, user_id_type),
+            "ClientState": "%d:%d:%s" % (state_branch, next_level, user_id_type),
             "Type": RESPONSE_USSD
         }
 
-    if level == 5:
+    if level == 3:
         user_id = request.data.get(MESSAGE)
-        user_id_type = request.data.get(CLIENT_STATE).split(":")[4]
-        constituency = request.data.get(CLIENT_STATE).split(":")[3]
-        user_name = request.data.get(CLIENT_STATE).split(":")[2]
+        user_id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
-        new_member = create_member(user_name, constituency, user_id_type, user_id)
-        if new_member.verified:
+        valid = check_validity(request.data.get("Mobile"))
+        if valid:
             return {
-                "Message": "Dear %s, you have been registered as a member already." % user_name,
+                "Message": "You have been registered to receive updates already.",
                 "Type": RELEASE_USSD
             }
 
@@ -106,26 +64,17 @@ def handle_registration(request, level):
             return {
                 "Message": "Please select a payment method to pay registration fee of GHS 3.00\n\n1. MTN Mobile "
                            "Money\n2. Aitel/Tigo Money",
-                "ClientState": "%d:%d:%s" % (state_branch, next_level, new_member.member_id,),
+                "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_id_type, user_id),
                 "Type": RESPONSE_USSD
             }
 
-    if level == 6:
-        member_id = request.data.get(CLIENT_STATE).split(":")[2]
-
-        payment_option = request.data.get(MESSAGE)
-
+    if level == 4:
         return {
-            "Message": "Please enter you mobile money number. You will be charged GHS 3.00 for registration",
-            "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, member_id, payment_option),
-            "Type": RESPONSE_USSD
+            "Message": "Thank you for applying for party updates. Please kindly confirm payment of mobile money phone "
+                       "to complete process. "
+                       " Charge is GHS 3.00",
+            "Type": RELEASE_USSD
         }
-
-    if level == 7:
-        member_id = request.data.get(CLIENT_STATE).split(":")[2]
-        payment_option = request.data.get(CLIENT_STATE).split(":")[3]
-
-        mobile_number = None
 
 
 def handle_payment(request, level):
