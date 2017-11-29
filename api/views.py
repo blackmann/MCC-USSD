@@ -50,7 +50,8 @@ def request_payment(mobile_number, amount, constituency, network):
                 "Member Constituency": constituency,
                 "Member Name": "N/A",
                 "USSD Number": "713"
-            }
+            },
+            "service": "5a12c32e2adb093f1c8bf0f4"
         }
 
         print(request_body)
