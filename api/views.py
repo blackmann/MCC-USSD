@@ -44,7 +44,8 @@ def create_member(user_name, constituency,
                               member_id=user_id,
                               constituency=constituency)
 
-    return not member_exists
+    return Member.objects.filter(id_type=actual_id_type,
+                                 member_id=user_id).first()
 
 
 def handle_registration(request, level):
@@ -94,17 +95,37 @@ def handle_registration(request, level):
         constituency = request.data.get(CLIENT_STATE).split(":")[3]
         user_name = request.data.get(CLIENT_STATE).split(":")[2]
 
-        if create_member(user_name, constituency, user_id_type, user_id):
+        new_member = create_member(user_name, constituency, user_id_type, user_id)
+        if new_member.verified:
             return {
-                "Message": "Dear %s, you have been registered as a member successfully. " % user_name,
+                "Message": "Dear %s, you have been registered as a member already." % user_name,
                 "Type": RELEASE_USSD
             }
 
         else:
             return {
-                "Message": "A member has already been registered with the ID you provided.",
-                "Type": RELEASE_USSD
+                "Message": "Please select a payment method to pay registration fee of GHS 3.00\n\n1. MTN Mobile "
+                           "Money\n2. Aitel/Tigo Money",
+                "ClientState": "%d:%d:%s" % (state_branch, next_level, new_member.member_id,),
+                "Type": RESPONSE_USSD
             }
+
+    if level == 6:
+        member_id = request.data.get(CLIENT_STATE).split(":")[2]
+
+        payment_option = request.data.get(MESSAGE)
+
+        return {
+            "Message": "Please enter you mobile money number. You will be charged GHS 3.00 for registration",
+            "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, member_id, payment_option),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 7:
+        member_id = request.data.get(CLIENT_STATE).split(":")[2]
+        payment_option = request.data.get(CLIENT_STATE).split(":")[3]
+
+        mobile_number = None
 
 
 def handle_payment(request, level):
@@ -114,41 +135,40 @@ def handle_payment(request, level):
 
     if level == 1:
         return {
-            "Message": "Please enter your name (First and last name)",
+            "Message": "Please select your ID type.\n\n1. Voter's ID\n2. Membership ID",
             "ClientState": "%d:%d" % (state_branch, next_level),
             "Type": RESPONSE_USSD
         }
 
-    # the person provides her name here
     if level == 2:
-        user_name = request.data.get(MESSAGE)
+        id_type = request.data.get(MESSAGE)
+        actual_id = ["Voters", "Membership"][int(id_type) - 1]
         return {
-            "Message": "Please enter you constituency",
-            "ClientState": "%d:%d:%s" % (state_branch, next_level, user_name),
+            "Message": "Please enter you %s ID number" % actual_id,
+            "ClientState": "%d:%d:%s" % (state_branch, next_level, id_type),
             "Type": RESPONSE_USSD
         }
 
-    # the person provides her constituency
     if level == 3:
-        constituency = request.data.get(MESSAGE)
-        user_name = request.data.get(CLIENT_STATE).split(":")[2]
+        user_id = request.data.get(MESSAGE)
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
         return {
-            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money\n3. Tigo Cash",
-            "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_name, constituency),
+            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel/Tigo Cash",
+            "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, id_type, user_id),
             "Type": RESPONSE_USSD
         }
 
     if level == 4:
         payment_option = request.data.get(MESSAGE)
-        if not (payment_option in [str(a) for a in range(1, 4)]):
+        if not (payment_option in [str(a) for a in range(1, 3)]):
             return invalid_option_data
 
-        constituency = request.data.get(CLIENT_STATE).split(":")[3]
-        user_name = request.data.get(CLIENT_STATE).split(":")[2]
+        user_id = request.data.get(CLIENT_STATE).split(":")[3]
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
         return {
             "Message": "Please enter your mobile money phone number",
-            "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, user_name, constituency, payment_option),
+            "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, id_type, user_id, payment_option),
             "Type": RESPONSE_USSD
         }
 
@@ -182,7 +202,8 @@ def index(request):
     if sequence == 1:
         data = {
             "Type": RESPONSE_USSD,
-            "Message": "Please select an option.\n\n1. Pay Dues\n2. Register as member",
+            "Message": "Please select an option.\n\n1. Pay Dues (GHS 1.00)\n2. Register to receive party messages ("
+                       "GHS 3.00)",
             "ClientState": INITIAL_CLIENT_STATE
         }
 

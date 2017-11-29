@@ -7,6 +7,7 @@ class Member(models.Model):
     name = models.CharField(max_length=70)
     registered_on = models.DateTimeField(auto_now_add=True)
     constituency = models.CharField(max_length=50)
+    verified = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('member_id', 'id_type', )
