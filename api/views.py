@@ -53,6 +53,8 @@ def request_payment(mobile_number, amount, constituency, network):
             }
         }
 
+        print(request_body)
+
         headers = {
             "Authorization": "Bearer %s" % access_token
         }
