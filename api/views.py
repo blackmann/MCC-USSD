@@ -47,7 +47,9 @@ def request_payment(mobile_number, amount, constituency, network):
             "thirdPartyRef": "N/A",
             "amount": amount,
             "parameters": {
-                "Member Constituency": constituency
+                "Member Constituency": constituency,
+                "Member Name": "N/A",
+                "USSD Number": "713"
             }
         }
 
