@@ -69,6 +69,20 @@ def handle_registration(request, level):
             }
 
     if level == 4:
+        payment_option = request.data.get(MESSAGE)
+        if not (payment_option in [str(a) for a in range(1, 3)]):
+            return invalid_option_data
+
+        user_id = request.data.get(CLIENT_STATE).split(":")[3]
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
+
+        return {
+            "Message": "Please enter your mobile money phone number",
+            "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, id_type, user_id, payment_option),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 5:
         return {
             "Message": "Thank you for applying for party updates. Please kindly confirm payment of mobile money phone "
                        "to complete process. "
@@ -124,10 +138,6 @@ def handle_payment(request, level):
     if level == 5:
         mobile_number = request.data.get(MESSAGE)
 
-        payment_option = request.data.get(CLIENT_STATE).split(":")[4]
-        constituency = request.data.get(CLIENT_STATE).split(":")[3]
-        user_name = request.data.get(CLIENT_STATE).split(":")[2]
-
         if len(mobile_number) != 10:
             return {
                 "Message": "The mobile number you provided is incorrect. Please try again.",
@@ -135,8 +145,8 @@ def handle_payment(request, level):
             }
 
         return {
-            "Message": "Thank you %s for initiating dues payment (GHS 1.00). Kindly confirm payment on mobile money "
-                       "phone to complete process. " % user_name,
+            "Message": "Thank you for initiating dues payment (GHS 1.00). Kindly confirm payment on mobile money "
+                       "phone to complete process.",
             "Type": RELEASE_USSD
         }
 
