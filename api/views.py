@@ -166,7 +166,7 @@ def handle_payment(request, level):
         }
 
     if level == 5:
-        mobile_number = request.data.get(MESSAGE)
+        mobile_number = "0" + request.data.get(MESSAGE)[3:]
 
         payment_option = request.data.get(CLIENT_STATE).split(":")[4]
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
@@ -180,7 +180,7 @@ def handle_payment(request, level):
                 "Type": RELEASE_USSD
             }
 
-        request_payment(request.data.get("Mobile"), 1, "N/A", payment_option_value)
+        request_payment(mobile_number, 1, "N/A", payment_option_value)
 
         return {
             "Message": "Thank you for initiating dues payment (GHS 1.00). Kindly confirm payment on mobile money "
