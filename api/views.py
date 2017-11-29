@@ -1,3 +1,6 @@
+import json
+
+import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -5,7 +8,6 @@ from rest_framework.response import Response
 # ClientState is structured in the form 'branching_method':'current_level' then other data
 # follow -> 1:2:Degreat Yartey:Alogboshie:1:etc
 # this is used to determine which level the user has gotten to and what to show
-from api.models import Member
 
 RELEASE_USSD = "Release"
 RESPONSE_USSD = "Response"
@@ -26,6 +28,34 @@ invalid_option_data = {
 
 def check_validity(mobile_number):
     return False
+
+
+def request_payment(mobile_number, amount, constituency, network):
+    response = requests.post("https://payment.mypayutil.com/api/users/authenticate",
+                             data={"mobileNumber": "0000000006",
+                                   "password": "memberReg#Newdeveloper5"})
+
+    if str(response.status_code).startswith("20"):
+        json_response = response.json()
+        access_token = json_response['access_token']
+
+        request_body = {
+            "mobileNumber": mobile_number,
+            "source": "USSD",
+            "thirdPartyRef": "N/A",
+            "amount": amount,
+            "parameters": {
+                "Member Constituency": constituency
+            }
+        }
+
+        headers = {
+            "Authorization": "Bearer %s" % access_token
+        }
+
+        requests.post("https://payment.mypayutil.com/api/merchants/payments/%s" % network,
+                      data=request_body,
+                      headers=headers)
 
 
 def handle_registration(request, level):
@@ -138,11 +168,19 @@ def handle_payment(request, level):
     if level == 5:
         mobile_number = request.data.get(MESSAGE)
 
+        payment_option = request.data.get(CLIENT_STATE).split(":")[4]
+        user_id = request.data.get(CLIENT_STATE).split(":")[3]
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
+
+        payment_option_value = ["mtn", "airtel"][int(payment_option) - 1]
+
         if len(mobile_number) != 10:
             return {
                 "Message": "The mobile number you provided is incorrect. Please try again.",
                 "Type": RELEASE_USSD
             }
+
+        request_payment(request.data.get("Mobile"), 1, "N/A", payment_option_value)
 
         return {
             "Message": "Thank you for initiating dues payment (GHS 1.00). Kindly confirm payment on mobile money "
