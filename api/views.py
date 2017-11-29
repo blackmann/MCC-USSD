@@ -5,7 +5,7 @@ from rest_framework.response import Response
 # ClientState is structured in the form 'branching_method':'current_level' then other data
 # follow -> 1:2:Degreat Yartey:Alogboshie:1:etc
 # this is used to determine which level the user has gotten to and what to show
-
+from api.models import Member
 
 RELEASE_USSD = "Release"
 RESPONSE_USSD = "Response"
@@ -26,7 +26,25 @@ invalid_option_data = {
 
 def create_member(user_name, constituency,
                   user_id_type, user_id):
-    return True
+    """
+
+    :param user_name:
+    :param constituency:
+    :param user_id_type: is the position in the menu for id type
+    :param user_id:
+    :return:
+    """
+    actual_id_type = ["Voters", "Member ID"][int(user_id_type) - 1]
+    member_exists = Member.objects.filter(id_type=actual_id_type,
+                                          member_id=user_id).exists()
+
+    if not member_exists:
+        Member.objects.create(name=user_name,
+                              id_type=actual_id_type,
+                              member_id=user_id,
+                              constituency=constituency)
+
+    return not member_exists
 
 
 def handle_registration(request, level):
