@@ -147,6 +147,25 @@ def handle_payment(request, level):
         user_name = request.data.get(CLIENT_STATE).split(":")[2]
 
         return {
+            "Message": "Please enter your mobile money phone number",
+            "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, user_name, constituency, payment_option),
+            "Type": RELEASE_USSD
+        }
+
+    if level == 5:
+        mobile_number = request.data.get(MESSAGE)
+
+        payment_option = request.data.get(CLIENT_STATE).split(":")[4]
+        constituency = request.data.get(CLIENT_STATE).split(":")[3]
+        user_name = request.data.get(CLIENT_STATE).split(":")[2]
+
+        if len(mobile_number) != 10:
+            return {
+                "Message": "The mobile number you provided is incorrect. Please try again.",
+                "Type": RELEASE_USSD
+            }
+
+        return {
             "Message": "Thank you %s for initiating dues payment (GHS 1.00). Kindly confirm payment on mobile money "
                        "phone to complete process. " % user_name,
             "Type": RELEASE_USSD
