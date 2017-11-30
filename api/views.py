@@ -307,6 +307,9 @@ def index(request):
             if user_response == OPTION_REGISTER_MEMBER:
                 return Response(handle_registration(request, 1))
 
+            if user_response == OPTION_PAY_DUES_EXECUTIVE:
+                return Response(handle_payment_executive(request, 1))
+
     if sequence > 2:
         client_state = request.data.get(CLIENT_STATE)
         branching_level_data = client_state.split(":")[:2]
