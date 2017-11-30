@@ -335,15 +335,21 @@ def index(request):
                 return Response(handle_registration(request, 1))
 
     if sequence == 3:
-        user_choice = request.data.get("Message", "0")
-        if not (user_choice in [str(a) for a in range(1, 3)]):
-            return Response(invalid_option_data)
+        # user might be coming from registration section
+        state_branch = request.data.get(CLIENT_STATE).split(":")[0]
+        if state_branch == "2":
+            # increase the sequence to continue process
+            sequence = sequence + 1
+        else:
+            user_choice = request.data.get("Message", "0")
+            if not (user_choice in [str(a) for a in range(1, 3)]):
+                return Response(invalid_option_data)
 
-        if user_choice == "1":
-            return Response(handle_payment(request, 1))
+            if user_choice == "1":
+                return Response(handle_payment(request, 1))
 
-        elif user_choice == "2":
-            return Response(handle_payment_executive(request, 1))
+            elif user_choice == "2":
+                return Response(handle_payment_executive(request, 1))
 
     if sequence > 3:
         client_state = request.data.get(CLIENT_STATE)
