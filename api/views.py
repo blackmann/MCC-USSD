@@ -289,6 +289,14 @@ def handle_payment_executive(request, level):
         }
 
 
+def payment_intermediary(request, level):
+    return {
+        "Message": "Please select one of the following.\n1. Ordinary Member (GHS 1.00)\n2. Executive Member (GHS 10.00)",
+        "Type": RESPONSE_USSD,
+        "ClientState": INITIAL_CLIENT_STATE
+    }
+
+
 @api_view(['POST'])
 def index(request):
     branching_methods = [handle_payment, handle_payment_executive, handle_registration]
@@ -299,9 +307,8 @@ def index(request):
     if sequence == 1:
         data = {
             "Type": RESPONSE_USSD,
-            "Message": "Please select an option.\n\n1. Pay Dues - Ordinary (GHS 1.00)"
-                       "\n2. Pay Dues - Executive (GHS 10.00)"
-                       "\n3. Register to receive party messages ("
+            "Message": "Please select an option.\n\n1. Pay Dues"
+                       "\n2. Register to receive party messages ("
                        "GHS 3.00)",
             "ClientState": INITIAL_CLIENT_STATE
         }
@@ -312,25 +319,33 @@ def index(request):
     if sequence == 2:
         client_state = request.data.get(CLIENT_STATE)
 
-        # when client state is 1, the person just began from the first
+        # the person just began from the first
         # screen
         if client_state == INITIAL_CLIENT_STATE:
             user_response = request.data.get(MESSAGE)
-            if not (user_response in [OPTION_PAY_DUES_ORDINARY, OPTION_REGISTER_MEMBER, OPTION_PAY_DUES_EXECUTIVE, ]):
+            if not (user_response in [OPTION_PAY_DUES_ORDINARY, OPTION_REGISTER_MEMBER, ]):
                 # the user did not select any of the valid options
                 return Response(invalid_option_data)
 
             # now branch to actual method
             if user_response == OPTION_PAY_DUES_ORDINARY:
-                return Response(handle_payment(request, 1))
+                return Response(payment_intermediary(request, 1))
 
             if user_response == OPTION_REGISTER_MEMBER:
                 return Response(handle_registration(request, 1))
 
-            if user_response == OPTION_PAY_DUES_EXECUTIVE:
-                return Response(handle_payment_executive(request, 1))
+    if sequence == 3:
+        user_choice = request.data.get("Message", "0")
+        if not (user_choice in [str(a) for a in range(1, 3)]):
+            return Response(invalid_option_data)
 
-    if sequence > 2:
+        if user_choice == "1":
+            return Response(handle_payment(request, 1))
+
+        elif user_choice == "2":
+            return Response(handle_payment_executive(request, 1))
+
+    if sequence > 3:
         client_state = request.data.get(CLIENT_STATE)
         branching_level_data = client_state.split(":")[:2]
 
