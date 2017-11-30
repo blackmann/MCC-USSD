@@ -112,14 +112,14 @@ def handle_registration(request, level):
         else:
             return {
                 "Message": "Please select a payment method to pay registration fee of GHS 3.00\n\n1. MTN Mobile "
-                           "Money\n2. Airtel Money\n 3. Tigo Cash",
+                           "Money\n2. Airtel Money",
                 "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_id_type, user_id),
                 "Type": RESPONSE_USSD
             }
 
     if level == 4:
         payment_option = request.data.get(MESSAGE)
-        if not (payment_option in [str(a) for a in range(1, 4)]):
+        if not (payment_option in [str(a) for a in range(1, 3)]):
             return invalid_option_data
 
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
@@ -176,14 +176,14 @@ def handle_payment(request, level):
         user_id = request.data.get(MESSAGE)
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
         return {
-            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money\n 3. Tigo Cash",
+            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money\n",
             "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, id_type, user_id),
             "Type": RESPONSE_USSD
         }
 
     if level == 4:
         payment_option = request.data.get(MESSAGE)
-        if not (payment_option in [str(a) for a in range(1, 4)]):
+        if not (payment_option in [str(a) for a in range(1, 3)]):
             return invalid_option_data
 
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
@@ -202,13 +202,13 @@ def handle_payment(request, level):
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
-        payment_option_value = get_network(payment_option)
-
         if len(mobile_number) != 10:
             return {
                 "Message": "The mobile number you provided is incorrect. Please try again.",
                 "Type": RELEASE_USSD
             }
+
+        payment_option_value = get_network(payment_option)
 
         ussd_number = request.data.get("Mobile")
         request_payment(mobile_number, 1, ussd_number, payment_option_value, id_type, user_id, "Dues - Ordinary")
@@ -245,14 +245,14 @@ def handle_payment_executive(request, level):
         user_id = request.data.get(MESSAGE)
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
         return {
-            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money\n 3. Tigo Cash",
+            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money",
             "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, id_type, user_id),
             "Type": RESPONSE_USSD
         }
 
     if level == 4:
         payment_option = request.data.get(MESSAGE)
-        if not (payment_option in [str(a) for a in range(1, 4)]):
+        if not (payment_option in [str(a) for a in range(1, 3)]):
             return invalid_option_data
 
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
@@ -271,7 +271,7 @@ def handle_payment_executive(request, level):
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
-        payment_option_value = ["mtn", "airtel", "tigo"][int(payment_option) - 1]
+        payment_option_value = get_network(payment_option)
 
         if len(mobile_number) != 10:
             return {
