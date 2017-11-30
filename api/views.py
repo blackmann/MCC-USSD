@@ -33,7 +33,7 @@ def get_network(position):
     return ["mtn", "airtel", "tigo"][int(position) - 1]
 
 
-def request_payment(mobile_number, amount, ussd_number, network):
+def request_payment(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
     response = requests.post("https://payment.mypayutil.com/api/users/authenticate",
                              data={"mobileNumber": "0000000006",
                                    "password": "memberReg#Newdeveloper5"})
@@ -44,15 +44,18 @@ def request_payment(mobile_number, amount, ussd_number, network):
         json_response = response.json()
         access_token = json_response['access_token']
 
+        actual_id = ["Voters", "Membership"][int(id_type) - 1]
+
         request_body = {
             "mobileNumber": mobile_number,
             "source": "USSD",
             "thirdPartyRef": "N/A",
             "amount": amount,
             "parameters": {
-                "Member Constituency": "N/A",
-                "Member Name": "N/A",
-                "USSD Number": ussd_number
+                "ID Type": actual_id,
+                "ID Number": id_number,
+                "Intent": intent,
+                "USSD Number": ussd_number,
             },
             "service": "5a12c32e2adb093f1c8bf0f4"
         }
@@ -134,9 +137,11 @@ def handle_registration(request, level):
             return invalid_option_data
 
         payment_option = request.data.get(CLIENT_STATE).split(":")[4]
+        user_id = request.data.get(CLIENT_STATE).split(":")[3]
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
         ussd_number = request.data.get("Mobile")
-        request_payment(mobile_number, 3, ussd_number, get_network(payment_option))
+        request_payment(mobile_number, 3, ussd_number, get_network(payment_option), id_type, user_id, "Registration")
 
         return {
             "Message": "Thank you for applying for party updates. Please kindly confirm payment of mobile money phone "
@@ -206,7 +211,7 @@ def handle_payment(request, level):
             }
 
         ussd_number = request.data.get("Mobile")
-        request_payment(mobile_number, 1, ussd_number, payment_option_value)
+        request_payment(mobile_number, 1, ussd_number, payment_option_value, id_type, user_id, "Dues - Ordinary")
 
         return {
             "Message": "Thank you for initiating dues payment (GHS 1.00). Kindly confirm payment on mobile money "
@@ -275,7 +280,7 @@ def handle_payment_executive(request, level):
             }
 
         ussd_number = request.data.get("Mobile")
-        request_payment(mobile_number, 10, ussd_number, payment_option_value)
+        request_payment(mobile_number, 10, ussd_number, payment_option_value, id_type, user_id, "Dues - Executive")
 
         return {
             "Message": "Thank you for initiating dues payment (GHS 10.00). Kindly confirm payment on mobile money "
