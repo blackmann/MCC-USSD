@@ -1,5 +1,3 @@
-import json
-
 import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -17,8 +15,9 @@ MESSAGE = "Message"
 
 INITIAL_CLIENT_STATE = "1"
 
-OPTION_PAY_DUES = "1"
-OPTION_REGISTER_MEMBER = "2"
+OPTION_PAY_DUES_ORDINARY = "1"
+OPTION_PAY_DUES_EXECUTIVE = "2"
+OPTION_REGISTER_MEMBER = "3"
 
 invalid_option_data = {
     "Type": RELEASE_USSD,
@@ -65,14 +64,14 @@ def request_payment(mobile_number, amount, constituency, network):
                             json=request_body,
                             headers=headers)
 
-        print("Request made %d %s" % (res.status_code, res.text, ))
+        print("Request made %d %s" % (res.status_code, res.text,))
 
     else:
         print("Failed %d" % response.status_code)
 
 
 def handle_registration(request, level):
-    state_branch = 1
+    state_branch = 2
     next_level = int(level) + 1
 
     # the person has provided constituency
@@ -106,14 +105,14 @@ def handle_registration(request, level):
         else:
             return {
                 "Message": "Please select a payment method to pay registration fee of GHS 3.00\n\n1. MTN Mobile "
-                           "Money\n2. Aitel/Tigo Money",
+                           "Money\n2. Airtel Money\n 3. Tigo Cash",
                 "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_id_type, user_id),
                 "Type": RESPONSE_USSD
             }
 
     if level == 4:
         payment_option = request.data.get(MESSAGE)
-        if not (payment_option in [str(a) for a in range(1, 3)]):
+        if not (payment_option in [str(a) for a in range(1, 4)]):
             return invalid_option_data
 
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
@@ -159,14 +158,14 @@ def handle_payment(request, level):
         user_id = request.data.get(MESSAGE)
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
         return {
-            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel/Tigo Cash",
+            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money\n 3. Tigo Cash",
             "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, id_type, user_id),
             "Type": RESPONSE_USSD
         }
 
     if level == 4:
         payment_option = request.data.get(MESSAGE)
-        if not (payment_option in [str(a) for a in range(1, 3)]):
+        if not (payment_option in [str(a) for a in range(1, 4)]):
             return invalid_option_data
 
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
@@ -185,7 +184,7 @@ def handle_payment(request, level):
         user_id = request.data.get(CLIENT_STATE).split(":")[3]
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
-        payment_option_value = ["mtn", "airtel"][int(payment_option) - 1]
+        payment_option_value = ["mtn", "airtel", "tigo"][int(payment_option) - 1]
 
         if len(mobile_number) != 10:
             return {
@@ -202,9 +201,77 @@ def handle_payment(request, level):
         }
 
 
+def handle_payment_executive(request, level):
+    # method info #
+    state_branch = 1
+    next_level = int(level) + 1
+
+    if level == 1:
+        return {
+            "Message": "Please select your ID type.\n\n1. Voter's ID\n2. Membership ID",
+            "ClientState": "%d:%d" % (state_branch, next_level),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 2:
+        id_type = request.data.get(MESSAGE)
+        actual_id = ["Voters", "Membership"][int(id_type) - 1]
+        return {
+            "Message": "Please enter you %s ID number" % actual_id,
+            "ClientState": "%d:%d:%s" % (state_branch, next_level, id_type),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 3:
+        user_id = request.data.get(MESSAGE)
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
+        return {
+            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money\n 3. Tigo Cash",
+            "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, id_type, user_id),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 4:
+        payment_option = request.data.get(MESSAGE)
+        if not (payment_option in [str(a) for a in range(1, 4)]):
+            return invalid_option_data
+
+        user_id = request.data.get(CLIENT_STATE).split(":")[3]
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
+
+        return {
+            "Message": "Please enter your mobile money phone number",
+            "ClientState": "%d:%d:%s:%s:%s" % (state_branch, next_level, id_type, user_id, payment_option),
+            "Type": RESPONSE_USSD
+        }
+
+    if level == 5:
+        mobile_number = request.data.get(MESSAGE)
+
+        payment_option = request.data.get(CLIENT_STATE).split(":")[4]
+        user_id = request.data.get(CLIENT_STATE).split(":")[3]
+        id_type = request.data.get(CLIENT_STATE).split(":")[2]
+
+        payment_option_value = ["mtn", "airtel", "tigo"][int(payment_option) - 1]
+
+        if len(mobile_number) != 10:
+            return {
+                "Message": "The mobile number you provided is incorrect. Please try again.",
+                "Type": RELEASE_USSD
+            }
+
+        request_payment(mobile_number, 10, "N/A", payment_option_value)
+
+        return {
+            "Message": "Thank you for initiating dues payment (GHS 10.00). Kindly confirm payment on mobile money "
+                       "phone to complete process.",
+            "Type": RELEASE_USSD
+        }
+
+
 @api_view(['POST'])
 def index(request):
-    branching_methods = [handle_payment, handle_registration]
+    branching_methods = [handle_payment, handle_payment_executive, handle_registration]
 
     sequence = request.data.get('Sequence', 0)
 
@@ -212,7 +279,9 @@ def index(request):
     if sequence == 1:
         data = {
             "Type": RESPONSE_USSD,
-            "Message": "Please select an option.\n\n1. Pay Dues (GHS 1.00)\n2. Register to receive party messages ("
+            "Message": "Please select an option.\n\n1. Pay Dues - Ordinary (GHS 1.00)"
+                       "\n2. Pay Dues - Executive (GHS 10.00)"
+                       "\n3. Register to receive party messages ("
                        "GHS 3.00)",
             "ClientState": INITIAL_CLIENT_STATE
         }
@@ -227,12 +296,12 @@ def index(request):
         # screen
         if client_state == INITIAL_CLIENT_STATE:
             user_response = request.data.get(MESSAGE)
-            if not (user_response in [OPTION_PAY_DUES, OPTION_REGISTER_MEMBER, ]):
+            if not (user_response in [OPTION_PAY_DUES_ORDINARY, OPTION_REGISTER_MEMBER, OPTION_PAY_DUES_EXECUTIVE, ]):
                 # the user did not select any of the valid options
                 return Response(invalid_option_data)
 
             # now branch to actual method
-            if user_response == OPTION_PAY_DUES:
+            if user_response == OPTION_PAY_DUES_ORDINARY:
                 return Response(handle_payment(request, 1))
 
             if user_response == OPTION_REGISTER_MEMBER:
