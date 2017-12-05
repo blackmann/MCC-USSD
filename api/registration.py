@@ -29,7 +29,7 @@ def handle_registration(request, level):
         user_id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
         return {
-            "Message": "Please select a payment method to pay registration fee of GHS 3.00\n\n"
+            "Message": "Please select a payment method to pay registration fee of GHS 1.00\n\n"
                        "1. MTN Mobile Money\n"
                        "2. Airtel Money",
             "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_id_type, user_id),
@@ -60,12 +60,12 @@ def handle_registration(request, level):
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
 
         ussd_number = request.data.get("Mobile")
-        request_payment(mobile_number, 3, ussd_number, get_network(payment_option), id_type, user_id, "Registration")
+        request_payment(mobile_number, 1, ussd_number, get_network(payment_option), id_type, user_id, "Registration")
 
         return {
             "Message": "Thank you for applying for party updates. Please kindly confirm payment of mobile money phone "
                        "to complete process. "
-                       " Charge is GHS 3.00",
+                       " Charge is GHS 1.00",
             "Type": RELEASE_USSD
         }
 

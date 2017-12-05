@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from api.payment_executive import handle_payment_executive
 from api.payment_ordinary import handle_payment_ordinary
 from api.registration import handle_registration
+from api.payment_sympathizer import handle_payment_sympathizer
 from api.util import *
 
 
@@ -63,7 +64,7 @@ def index(request):
             sequence = sequence + 1
         else:
             user_choice = request.data.get("Message", "0")
-            if not (user_choice in [str(a) for a in range(1, 3)]):
+            if not (user_choice in [str(a) for a in range(1, 4)]):
                 return Response(invalid_option_data)
 
             if user_choice == "1":
@@ -71,6 +72,9 @@ def index(request):
 
             elif user_choice == "2":
                 return Response(handle_payment_executive(request, 1))
+
+            elif user_choice == "3":
+                return Response(handle_payment_sympathizer(request, 1))
 
     if sequence > 3:
         client_state = request.data.get(CLIENT_STATE)
