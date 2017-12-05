@@ -63,7 +63,12 @@ def handle_payment_sympathizer(request, level):
 
         return {
             "Message": "Please enter your mobile money phone number",
-            "ClientState": "%d:%d:%s:%s:%.2f:%s" % (state_branch, next_level, id_type, user_id, amount, payment_option),
+            "ClientState": "%d:%d:%s:%s:%.2f:%s" % (state_branch,
+                                                    next_level,
+                                                    id_type,
+                                                    user_id,
+                                                    float(amount),
+                                                    payment_option),
             "Type": RESPONSE_USSD
         }
 
