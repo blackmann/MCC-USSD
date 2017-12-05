@@ -67,7 +67,7 @@ def handle_payment_sympathizer(request, level):
                         float(amount),
                         ussd_number,
                         payment_option_value,
-                        "N/A",
+                        2,
                         "N/A", "Dues - Sympathizer")
 
         return {
