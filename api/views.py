@@ -84,7 +84,9 @@ def handle_registration(request, level):
     # the person has provided constituency
     if level == 1:
         return {
-            "Message": "Please select a ID type.\n\n1. Voter's ID\n2. Membership ID",
+            "Message": "Please select a ID type.\n\n"
+                       "1. Voter's ID\n"
+                       "2. Membership ID",
             "ClientState": "%d:%d" % (state_branch, next_level,),
             "Type": RESPONSE_USSD
         }
@@ -111,8 +113,9 @@ def handle_registration(request, level):
 
         else:
             return {
-                "Message": "Please select a payment method to pay registration fee of GHS 3.00\n\n1. MTN Mobile "
-                           "Money\n2. Airtel Money",
+                "Message": "Please select a payment method to pay registration fee of GHS 3.00\n\n"
+                           "1. MTN Mobile Money\n"
+                           "2. Airtel Money",
                 "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, user_id_type, user_id),
                 "Type": RESPONSE_USSD
             }
@@ -158,7 +161,9 @@ def handle_payment(request, level):
 
     if level == 1:
         return {
-            "Message": "Please select your ID type.\n\n1. Voter's ID\n2. Membership ID",
+            "Message": "Please select your ID type.\n\n"
+                       "1. Voter's ID\n"
+                       "2. Membership ID",
             "ClientState": "%d:%d" % (state_branch, next_level),
             "Type": RESPONSE_USSD
         }
@@ -245,7 +250,9 @@ def handle_payment_executive(request, level):
         user_id = request.data.get(MESSAGE)
         id_type = request.data.get(CLIENT_STATE).split(":")[2]
         return {
-            "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money",
+            "Message": "Please select a payment method.\n\n"
+                       "1. MTN Mobile Money\n"
+                       "2. Airtel Money",
             "ClientState": "%d:%d:%s:%s" % (state_branch, next_level, id_type, user_id),
             "Type": RESPONSE_USSD
         }
@@ -291,7 +298,10 @@ def handle_payment_executive(request, level):
 
 def payment_intermediary(request, level):
     return {
-        "Message": "Please select one of the following.\n1. Ordinary Member (GHS 1.00)\n2. Executive Member (GHS 10.00)",
+        "Message": "Please select one of the following.\n"
+                   "1. Ordinary Member (GHS 1.00)\n"
+                   "2. Executive Member (GHS 10.00)\n"
+                   "3. Sympathizer",
         "Type": RESPONSE_USSD,
         "ClientState": INITIAL_CLIENT_STATE
     }
