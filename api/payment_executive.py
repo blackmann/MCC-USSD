@@ -63,10 +63,10 @@ def handle_payment_executive(request, level):
             }
 
         ussd_number = request.data.get("Mobile")
-        request_payment(mobile_number, 10, ussd_number, payment_option_value, id_type, user_id, "Dues - Executive")
+        request_payment(mobile_number, 5, ussd_number, payment_option_value, id_type, user_id, "Dues - Executive")
 
         return {
-            "Message": "Thank you for initiating dues payment (GHS 10.00). Kindly confirm payment on mobile money "
+            "Message": "Thank you for initiating dues payment (GHS 5.00). Kindly confirm payment on mobile money "
                        "phone to complete process.",
             "Type": RELEASE_USSD
         }
