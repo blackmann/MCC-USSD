@@ -21,7 +21,10 @@ def payment_intermediary(request, level):
 
 @api_view(['POST'])
 def index(request):
-    branching_methods = [handle_payment_ordinary, handle_payment_executive, handle_registration]
+    branching_methods = [handle_payment_ordinary,
+                         handle_payment_executive,
+                         handle_payment_sympathizer,
+                         handle_registration]
 
     sequence = request.data.get('Sequence', 0)
 

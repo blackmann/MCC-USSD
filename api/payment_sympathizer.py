@@ -3,7 +3,7 @@ from api.util import *
 
 def handle_payment_sympathizer(request, level):
     # method info #
-    state_branch = 1
+    state_branch = 2
     next_level = int(level) + 1
 
     if level == 1:

@@ -2,7 +2,7 @@ from api.util import *
 
 
 def handle_registration(request, level):
-    state_branch = 2
+    state_branch = 3
     next_level = int(level) + 1
 
     # the person has provided constituency
