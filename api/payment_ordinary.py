@@ -63,7 +63,7 @@ def handle_payment_ordinary(request, level):
         payment_option_value = get_network(payment_option)
 
         ussd_number = request.data.get("Mobile")
-        request_payment(mobile_number, 1, ussd_number, payment_option_value, id_type, user_id, "Dues - Ordinary")
+        request_payment(mobile_number, 1, ussd_number, payment_option_value, id_type, user_id, "Dues - General")
 
         return {
             "Message": "Thank you for initiating dues payment (GHS 1.00). Kindly confirm payment on mobile money "

@@ -11,7 +11,7 @@ from api.util import *
 def payment_intermediary(request, level):
     return {
         "Message": "Please select one of the following.\n"
-                   "1. Ordinary Member (GHS 1.00)\n"
+                   "1. General Member (GHS 1.00)\n"
                    "2. Executive Member (GHS 5.00)\n"
                    "3. Sympathizer",
         "Type": RESPONSE_USSD,
