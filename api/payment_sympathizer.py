@@ -98,6 +98,6 @@ def handle_payment_sympathizer(request, level):
 
         return {
             "Message": "Thank you for initiating dues payment GHS %.2f. Kindly confirm payment on mobile money "
-                       "phone to complete process." % amount,
+                       "phone to complete process." % float(amount),
             "Type": RELEASE_USSD
         }
