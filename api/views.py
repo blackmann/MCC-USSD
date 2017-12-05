@@ -62,7 +62,7 @@ def index(request):
     if sequence == 3:
         # user might be coming from registration section
         state_branch = request.data.get(CLIENT_STATE).split(":")[0]
-        if state_branch == "2":
+        if state_branch == "3":
             # increase the sequence to continue process
             sequence = sequence + 1
         else:
