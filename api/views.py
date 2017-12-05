@@ -34,7 +34,7 @@ def index(request):
             "Type": RESPONSE_USSD,
             "Message": "Please select an option.\n\n1. Pay Dues"
                        "\n2. Register to receive party messages ("
-                       "GHS 3.00)",
+                       "GHS 1.00)",
             "ClientState": INITIAL_CLIENT_STATE
         }
 
