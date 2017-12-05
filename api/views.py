@@ -32,7 +32,7 @@ def index(request):
     if sequence == 1:
         data = {
             "Type": RESPONSE_USSD,
-            "Message": "Please select an option.\n\n1. Pay Dues"
+            "Message": "NDC Payment Platform\nPlease select an option.\n\n1. Pay Dues"
                        "\n2. Register to receive party messages ("
                        "GHS 1.00)",
             "ClientState": INITIAL_CLIENT_STATE
