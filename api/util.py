@@ -27,7 +27,7 @@ def get_network(position):
     return ["mtn", "airtel", "tigo"][int(position) - 1]
 
 
-def request_payment(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
+def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
     response = requests.post("https://payment.mypayutil.com/api/users/authenticate",
                              data={"mobileNumber": "0000000006",
                                    "password": "memberReg#Newdeveloper5"})
@@ -69,3 +69,11 @@ def request_payment(mobile_number, amount, ussd_number, network, id_type, id_num
 
     else:
         print("Failed %d" % response.status_code)
+
+
+def request_payment(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
+    import threading
+
+    thread = threading.Thread(target=pay, args=(mobile_number, amount, ussd_number, network, id_type, id_number, intent))
+    thread.daemon = True
+    thread.start()

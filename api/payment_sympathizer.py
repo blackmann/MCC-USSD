@@ -64,16 +64,12 @@ def handle_payment_sympathizer(request, level):
 
         ussd_number = request.data.get("Mobile")
 
-        import threading
-        thread = threading.Thread(target=request_payment,
-                                  args=(mobile_number,
-                                        float(amount),
-                                        ussd_number,
-                                        payment_option_value,
-                                        2,
-                                        "N/A", "Dues - Sympathizer"))
-        thread.daemon = True
-        thread.start()
+        request_payment(mobile_number,
+                        float(amount),
+                        ussd_number,
+                        payment_option_value,
+                        2,
+                        "N/A", "Dues - Sympathizer")
 
         return {
             "Message": "Thank you for initiating dues payment GHS %.2f. Kindly confirm payment on mobile money "
