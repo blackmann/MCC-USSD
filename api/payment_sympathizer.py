@@ -9,7 +9,7 @@ def handle_payment_sympathizer(request, level):
     if level == 1:
         return {
             "Message": "Please specify amount you want to pay.",
-            "ClientState": "%d:%d" % (state_branch, next_level),
+            "ClientState": "%s:%d:%d" % (BRANCH_B, state_branch, next_level),
             "Type": RESPONSE_USSD
         }
 
@@ -23,7 +23,7 @@ def handle_payment_sympathizer(request, level):
                 "Message": "Please select a payment method.\n\n"
                            "1. MTN Mobile Money\n"
                            "2. Airtel Money",
-                "ClientState": "%d:%d:%.2f" % (state_branch, next_level, parsed_amount),
+                "ClientState": "%s:%d:%d:%.2f" % (BRANCH_B, state_branch, next_level, parsed_amount),
                 "Type": RESPONSE_USSD
             }
         except ValueError:
@@ -37,22 +37,23 @@ def handle_payment_sympathizer(request, level):
         if not (payment_option in [str(a) for a in range(1, 3)]):
             return invalid_option_data
 
-        amount = request.data.get(CLIENT_STATE).split(":")[2]
+        amount = request.data.get(CLIENT_STATE).split(":")[3]
 
         return {
             "Message": "Please enter your mobile money phone number",
-            "ClientState": "%d:%d:%.2f:%s" % (state_branch,
-                                              next_level,
-                                              float(amount),
-                                              payment_option),
+            "ClientState": "%s:%d:%d:%.2f:%s" % (BRANCH_B,
+                                                 state_branch,
+                                                 next_level,
+                                                 float(amount),
+                                                 payment_option),
             "Type": RESPONSE_USSD
         }
 
     if level == 4:
         mobile_number = request.data.get(MESSAGE)
 
-        payment_option = request.data.get(CLIENT_STATE).split(":")[3]
-        amount = request.data.get(CLIENT_STATE).split(":")[2]
+        payment_option = request.data.get(CLIENT_STATE).split(":")[4]
+        amount = request.data.get(CLIENT_STATE).split(":")[3]
 
         payment_option_value = get_network(payment_option)
 
