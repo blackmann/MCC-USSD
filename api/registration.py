@@ -63,7 +63,7 @@ def handle_registration(request, level):
         request_payment(mobile_number, 1, ussd_number, get_network(payment_option), id_type, user_id, "Registration")
 
         return {
-            "Message": "Thank you for applying for party updates. Please kindly confirm payment of mobile money phone "
+            "Message": "Thank you for applying for party updates. Please kindly confirm payment on mobile money phone "
                        "to complete process. "
                        " Charge is GHS 1.00",
             "Type": RELEASE_USSD

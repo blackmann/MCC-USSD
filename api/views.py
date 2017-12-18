@@ -15,7 +15,7 @@ def payment_intermediary(request, level):
                    "2. Executive Member (GHS 5.00)\n"
                    "3. Sympathizer",
         "Type": RESPONSE_USSD,
-        "ClientState": BRANCH_B
+        "ClientState": "%s:%s" % (BRANCH_B, "0")
     }
 
 
