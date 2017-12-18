@@ -18,6 +18,7 @@ OPTION_PAY_DUES_ORDINARY = "1"
 OPTION_REGISTER_MEMBER = "2"
 
 BRANCH_B = "b"
+BRANCH_C = "c"
 
 invalid_option_data = {
     "Type": RELEASE_USSD,

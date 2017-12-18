@@ -5,6 +5,7 @@ from api.payment_executive import handle_payment_executive
 from api.payment_ordinary import handle_payment_ordinary
 from api.registration import handle_registration
 from api.payment_sympathizer import handle_payment_sympathizer
+from api.party_agent import party_agent
 from api.util import *
 
 
@@ -46,7 +47,7 @@ def index(request):
             return Response(invalid_option_data)
 
         if user_choice == "2":
-            pass
+            return Response(party_agent(request, 1))
 
         else:
             data = {
@@ -80,7 +81,7 @@ def index(request):
                 return Response(handle_registration(request, 1))
 
         else:
-            pass
+            return Response(party_agent(request, 2))
 
     if sequence == 4:
         head_branch = request.data.get(CLIENT_STATE).split(":")[0]
@@ -104,7 +105,7 @@ def index(request):
                     return Response(handle_payment_sympathizer(request, 1))
 
         else:
-            pass
+            return Response(party_agent(request, 3))
 
     if sequence > 4:
         head_branch = request.data.get(CLIENT_STATE).split(":")[0]
@@ -119,4 +120,4 @@ def index(request):
             return Response(branching_methods[branching_method_position](request, branching_level))
 
         else:
-            pass
+            return Response(party_agent(request, 4))
