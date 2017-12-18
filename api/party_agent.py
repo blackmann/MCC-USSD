@@ -35,5 +35,5 @@ def party_agent(request, level):
 
         return {
             "Type": RELEASE_USSD,
-            "Message": "Member registration successful. Thank you."
+            "Message": "Input successful. Thank you."
         }
