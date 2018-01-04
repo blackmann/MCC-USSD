@@ -1,3 +1,4 @@
+from api.pins import pins
 from api.util import *
 
 
@@ -11,6 +12,12 @@ def party_agent(request, level):
 
     if level == 2:
         password = request.data.get(MESSAGE)
+
+        if not (password in pins):
+            return {
+                "Type": RELEASE_USSD,
+                "Message": "Sorry the pin you entered is incorrect. Please try again!",
+            }
 
         return {
             "Type": RESPONSE_USSD,
