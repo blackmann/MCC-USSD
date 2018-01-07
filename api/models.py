@@ -22,3 +22,9 @@ class Payment(models.Model):
     confirmed_on = models.DateTimeField(null=True)
     member = models.CharField(max_length=70)
     constituency = models.CharField(max_length=50)
+
+
+class Registration(models.Model):
+    agent_pin = models.CharField(max_length=10)
+    member_id = models.CharField(max_length=50)
+    member_name = models.CharField(max_length=100)
