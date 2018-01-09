@@ -10,7 +10,7 @@ class Member(models.Model):
     verified = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('member_id', 'id_type', )
+        unique_together = ('member_id', 'id_type',)
 
     def __str__(self):
         return self.name
@@ -28,3 +28,4 @@ class Registration(models.Model):
     agent_pin = models.CharField(max_length=10)
     member_id = models.CharField(max_length=50)
     member_name = models.CharField(max_length=100)
+    date_registered = models.DateField(auto_now_add=True, null=True)
