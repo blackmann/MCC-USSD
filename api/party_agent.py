@@ -28,7 +28,7 @@ def party_agent(request, level):
 
     if level == 3:
         member_name = request.data.get(MESSAGE)
-        password = request.data.get(CLIENT_STATE)[1]
+        password = request.data.get(CLIENT_STATE).split(':')[1]
 
         return {
             "Type": RESPONSE_USSD,
@@ -38,8 +38,8 @@ def party_agent(request, level):
 
     if level == 4:
         member_id = request.data.get(MESSAGE)
-        member_name = request.data.get(CLIENT_STATE)[2]
-        password = request.data.get(CLIENT_STATE)[1]
+        member_name = request.data.get(CLIENT_STATE).split(":")[2]
+        password = request.data.get(CLIENT_STATE).split(":")[1]
 
         Registration.objects.create(agent_pin=password,
                                     member_name=member_name,
