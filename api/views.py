@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.serializers import ModelSerializer
 
+from api.models import Registration
 from api.payment_executive import handle_payment_executive
 from api.payment_ordinary import handle_payment_ordinary
 from api.registration import handle_registration
@@ -121,3 +123,17 @@ def index(request):
 
         else:
             return Response(party_agent(request, 4))
+
+
+
+class RegistrationSerializer(ModelSerializer):
+    class Meta:
+        model = Registration
+
+
+@api_view(['GET'])
+def get_registrations(request):
+    registrations = Registration.objects.all()
+    data = RegistrationSerializer(registrations, many=True).data
+
+    return Response(data)

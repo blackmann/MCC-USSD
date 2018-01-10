@@ -10,7 +10,7 @@ class Member(models.Model):
     verified = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('member_id', 'id_type',)
+        unique_together = ('member_id', 'id_type', )
 
     def __str__(self):
         return self.name
