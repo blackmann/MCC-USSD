@@ -125,10 +125,10 @@ def index(request):
             return Response(party_agent(request, 4))
 
 
-
 class RegistrationSerializer(ModelSerializer):
     class Meta:
         model = Registration
+        fields = '__all__'
 
 
 @api_view(['GET'])
