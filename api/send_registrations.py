@@ -12,10 +12,10 @@ def send_registration(reg):
         'auth': '~ragnal~&*$^#'
     }
 
-    requests.post('http://www.mysmsinbox.com/mypayutil/ndc_callback.php',
-                  data=form_data)
+    res = requests.post('http://www.mysmsinbox.com/mypayutil/ndc_callback.php',
+                        data=form_data)
 
-    print("%d : SUCCESS" % reg.id)
+    print("%d : SUCCESS (%s)" % (reg.id, res.status_code))
 
 
 def send_registrations():
