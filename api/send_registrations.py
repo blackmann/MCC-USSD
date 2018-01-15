@@ -15,6 +15,8 @@ def send_registration(reg):
     requests.post('http://www.mysmsinbox.com/mypayutil/ndc_callback.php',
                   data=form_data)
 
+    print("%d : SUCCESS" % reg.id)
+
 
 def send_registrations():
     registrations = Registration.objects.all()
