@@ -49,7 +49,7 @@ def party_agent(request, level):
         import threading
 
         thread = threading.Thread(target=send_registration,
-                                  args=reg)
+                                  args=(reg, ))
         thread.daemon = True
         thread.start()
 
