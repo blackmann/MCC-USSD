@@ -1,6 +1,7 @@
 from api.models import Registration
 from api.pins import pins
 from api.util import *
+from api.send_registrations import send_registration
 
 
 def party_agent(request, level):
@@ -41,9 +42,11 @@ def party_agent(request, level):
         member_name = request.data.get(CLIENT_STATE).split(":")[2]
         password = request.data.get(CLIENT_STATE).split(":")[1]
 
-        Registration.objects.create(agent_pin=password,
+        reg = Registration.objects.create(agent_pin=password,
                                     member_name=member_name,
                                     member_id=member_id)
+
+        send_registration(reg)
 
         return {
             "Type": RELEASE_USSD,
