@@ -43,10 +43,15 @@ def party_agent(request, level):
         password = request.data.get(CLIENT_STATE).split(":")[1]
 
         reg = Registration.objects.create(agent_pin=password,
-                                    member_name=member_name,
-                                    member_id=member_id)
+                                          member_name=member_name,
+                                          member_id=member_id)
 
-        send_registration(reg)
+        import threading
+
+        thread = threading.Thread(target=send_registration,
+                                  args=reg)
+        thread.daemon = True
+        thread.start()
 
         return {
             "Type": RELEASE_USSD,
