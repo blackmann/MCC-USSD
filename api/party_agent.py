@@ -42,9 +42,9 @@ def party_agent(request, level):
         member_name = request.data.get(CLIENT_STATE).split(":")[2]
         password = request.data.get(CLIENT_STATE).split(":")[1]
 
-        # reg = Registration.objects.create(agent_pin=password,
-        #                                  member_name=member_name,
-        #                                  member_id=member_id)
+        reg = Registration(agent_pin=password,
+                           member_name=member_name,
+                           member_id=member_id)
 
         import threading
 
