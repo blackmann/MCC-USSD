@@ -11,7 +11,7 @@ def handle_registration(request, level):
             "Message": "Please select a ID type.\n\n"
                        "1. Voter's ID\n"
                        "2. Membership ID",
-            "ClientState": "%s:%d:%d" % (BRANCH_B, state_branch, next_level,),
+            "ClientState": "%s:%d:%d" % (BRANCH_A, state_branch, next_level,),
             "Type": RESPONSE_USSD
         }
 
@@ -20,7 +20,7 @@ def handle_registration(request, level):
 
         return {
             "Message": "Please enter your ID Number",
-            "ClientState": "%s:%d:%d:%s" % (BRANCH_B, state_branch, next_level, user_id_type),
+            "ClientState": "%s:%d:%d:%s" % (BRANCH_A, state_branch, next_level, user_id_type),
             "Type": RESPONSE_USSD
         }
 
@@ -32,7 +32,7 @@ def handle_registration(request, level):
             "Message": "Please select a payment method to pay registration fee of GHS 1.00\n\n"
                        "1. MTN Mobile Money\n"
                        "2. Airtel Money",
-            "ClientState": "%s:%d:%d:%s:%s" % (BRANCH_B, state_branch, next_level, user_id_type, user_id),
+            "ClientState": "%s:%d:%d:%s:%s" % (BRANCH_A, state_branch, next_level, user_id_type, user_id),
             "Type": RESPONSE_USSD
         }
 
@@ -46,7 +46,7 @@ def handle_registration(request, level):
 
         return {
             "Message": "Please enter your mobile money phone number",
-            "ClientState": "%s:%d:%d:%s:%s:%s" % (BRANCH_B, state_branch, next_level, id_type, user_id, payment_option),
+            "ClientState": "%s:%d:%d:%s:%s:%s" % (BRANCH_A, state_branch, next_level, id_type, user_id, payment_option),
             "Type": RESPONSE_USSD
         }
 

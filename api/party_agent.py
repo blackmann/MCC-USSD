@@ -9,7 +9,7 @@ def party_agent(request, level):
         return {
             "Type": RESPONSE_USSD,
             "Message": "Please enter your password",
-            "ClientState": "%s" % BRANCH_C
+            "ClientState": "%s" % BRANCH_B
         }
 
     if level == 2:
@@ -24,7 +24,7 @@ def party_agent(request, level):
         return {
             "Type": RESPONSE_USSD,
             "Message": "Enter name of Member",
-            "ClientState": "%s:%s" % (BRANCH_C, password),
+            "ClientState": "%s:%s" % (BRANCH_B, password),
         }
 
     if level == 3:
@@ -34,7 +34,7 @@ def party_agent(request, level):
         return {
             "Type": RESPONSE_USSD,
             "Message": "Enter the ID of the member",
-            "ClientState": "%s:%s:%s" % (BRANCH_C, password, member_name)
+            "ClientState": "%s:%s:%s" % (BRANCH_B, password, member_name)
         }
 
     if level == 4:

@@ -11,7 +11,7 @@ def handle_payment_ordinary(request, level):
             "Message": "Please select your ID type.\n\n"
                        "1. Voter's ID\n"
                        "2. Membership ID",
-            "ClientState": "%s:%d:%d" % (BRANCH_B, state_branch, next_level),
+            "ClientState": "%s:%d:%d" % (BRANCH_A, state_branch, next_level),
             "Type": RESPONSE_USSD
         }
 
@@ -20,7 +20,7 @@ def handle_payment_ordinary(request, level):
         actual_id = ["Voters", "Membership"][int(id_type) - 1]
         return {
             "Message": "Please enter you %s ID number" % actual_id,
-            "ClientState": "%s:%d:%d:%s" % (BRANCH_B, state_branch, next_level, id_type),
+            "ClientState": "%s:%d:%d:%s" % (BRANCH_A, state_branch, next_level, id_type),
             "Type": RESPONSE_USSD
         }
 
@@ -29,7 +29,7 @@ def handle_payment_ordinary(request, level):
         id_type = request.data.get(CLIENT_STATE).split(":")[3]
         return {
             "Message": "Please select a payment method.\n\n1. MTN Mobile Money\n2. Airtel Money\n",
-            "ClientState": "%s:%d:%d:%s:%s" % (BRANCH_B, state_branch, next_level, id_type, user_id),
+            "ClientState": "%s:%d:%d:%s:%s" % (BRANCH_A, state_branch, next_level, id_type, user_id),
             "Type": RESPONSE_USSD
         }
 
@@ -43,7 +43,7 @@ def handle_payment_ordinary(request, level):
 
         return {
             "Message": "Please enter your mobile money phone number",
-            "ClientState": "%s:%d:%d:%s:%s:%s" % (BRANCH_B, state_branch, next_level, id_type, user_id, payment_option),
+            "ClientState": "%s:%d:%d:%s:%s:%s" % (BRANCH_A, state_branch, next_level, id_type, user_id, payment_option),
             "Type": RESPONSE_USSD
         }
 

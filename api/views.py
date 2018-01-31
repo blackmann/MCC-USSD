@@ -3,32 +3,13 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
 from api.models import Registration
-from api.payment_executive import handle_payment_executive
-from api.payment_ordinary import handle_payment_ordinary
-from api.registration import handle_registration
-from api.payment_sympathizer import handle_payment_sympathizer
+from api.option_1 import option_1
 from api.party_agent import party_agent
-from api.util import *
-
-
-def payment_intermediary(request, level):
-    return {
-        "Message": "Please select one of the following.\n"
-                   "1. General Member (GHS 1.00)\n"
-                   "2. Executive Member (GHS 5.00)\n"
-                   "3. Sympathizer",
-        "Type": RESPONSE_USSD,
-        "ClientState": "%s:%s" % (BRANCH_B, "0")
-    }
+from api.util import RESPONSE_USSD, MESSAGE, invalid_option_data, BRANCH_A, BRANCH_B, CLIENT_STATE
 
 
 @api_view(['POST'])
 def index(request):
-    branching_methods = [handle_payment_ordinary,
-                         handle_payment_executive,
-                         handle_payment_sympathizer,
-                         handle_registration]
-
     sequence = request.data.get('Sequence', 0)
 
     if sequence == 1:
@@ -45,84 +26,32 @@ def index(request):
     if sequence == 2:
         user_choice = request.data.get(MESSAGE)
 
-        if not (user_choice in (str(a) for a in range(1, 3))):
-            return Response(invalid_option_data)
-
         if user_choice == "2":
-            return Response(party_agent(request, 1))
+            # Party agent branch
+            return Response(party_agent(request, 1) or invalid_option_data)
 
-        else:
-            data = {
-                "Type": RESPONSE_USSD,
-                "Message": "Please select an option.\n\n"
-                           "1. Pay Dues"
-                           "\n2. Register to receive party messages ("
-                           "GHS 1.00)",
-                "ClientState": BRANCH_B
-            }
+        if user_choice == "1":
+            # Dues payment branch
+            return Response(option_1(request, 1) or invalid_option_data)
 
-            return Response(data)
+    if sequence > 2:
+        level = sequence - 1
+        branch = request.data.get(CLIENT_STATE).split(":")[0]
 
-    # user has made selection
-    if sequence == 3:
-        client_state = request.data.get(CLIENT_STATE)
+        # adding `or invalid_option_data` to all responses
+        # to handle all cases of incorrect input from the
+        # branching methods. This way we wont be returning
+        # invalid... for every level in the branches
 
-        # the person just began from the first
-        # screen
-        if client_state == BRANCH_B:
-            user_response = request.data.get(MESSAGE)
-            if not (user_response in [OPTION_PAY_DUES_ORDINARY, OPTION_REGISTER_MEMBER, ]):
-                # the user did not select any of the valid options
-                return Response(invalid_option_data)
+        if branch == BRANCH_B:
+            # Party agent branch
+            return Response(party_agent(request, level) or invalid_option_data)
 
-            # now branch to actual method
-            if user_response == OPTION_PAY_DUES_ORDINARY:
-                return Response(payment_intermediary(request, 1))
+        if branch == BRANCH_A:
+            # Dues payment branch
+            return Response(option_1(request, level) or invalid_option_data)
 
-            if user_response == OPTION_REGISTER_MEMBER:
-                return Response(handle_registration(request, 1))
-
-        else:
-            return Response(party_agent(request, 2))
-
-    if sequence == 4:
-        head_branch = request.data.get(CLIENT_STATE).split(":")[0]
-        if head_branch == BRANCH_B:
-            state_branch = request.data.get(CLIENT_STATE).split(":")[1]
-            if state_branch == "3":
-                # increase the sequence to continue process
-                sequence = sequence + 1
-            else:
-                user_choice = request.data.get("Message", "0")
-                if not (user_choice in [str(a) for a in range(1, 4)]):
-                    return Response(invalid_option_data)
-
-                if user_choice == "1":
-                    return Response(handle_payment_ordinary(request, 1))
-
-                elif user_choice == "2":
-                    return Response(handle_payment_executive(request, 1))
-
-                elif user_choice == "3":
-                    return Response(handle_payment_sympathizer(request, 1))
-
-        else:
-            return Response(party_agent(request, 3))
-
-    if sequence > 4:
-        head_branch = request.data.get(CLIENT_STATE).split(":")[0]
-        if head_branch == BRANCH_B:
-            client_state = request.data.get(CLIENT_STATE)
-            branching_level_data = client_state.split(":")[1:3]
-
-            # now branch to method to handle handle request
-            # notes on this is found at the top of this file
-            branching_method_position = int(branching_level_data[0])
-            branching_level = int(branching_level_data[1])
-            return Response(branching_methods[branching_method_position](request, branching_level))
-
-        else:
-            return Response(party_agent(request, 4))
+    return Response(invalid_option_data)
 
 
 class RegistrationSerializer(ModelSerializer):

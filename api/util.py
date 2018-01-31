@@ -17,8 +17,8 @@ OPTION_PAY_DUES_ORDINARY = "1"
 # OPTION_PAY_DUES_EXECUTIVE = "2"
 OPTION_REGISTER_MEMBER = "2"
 
+BRANCH_A = "a"
 BRANCH_B = "b"
-BRANCH_C = "c"
 
 invalid_option_data = {
     "Type": RELEASE_USSD,

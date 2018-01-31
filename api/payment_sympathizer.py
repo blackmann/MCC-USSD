@@ -9,7 +9,7 @@ def handle_payment_sympathizer(request, level):
     if level == 1:
         return {
             "Message": "Please specify amount you want to pay.",
-            "ClientState": "%s:%d:%d" % (BRANCH_B, state_branch, next_level),
+            "ClientState": "%s:%d:%d" % (BRANCH_A, state_branch, next_level),
             "Type": RESPONSE_USSD
         }
 
@@ -23,7 +23,7 @@ def handle_payment_sympathizer(request, level):
                 "Message": "Please select a payment method.\n\n"
                            "1. MTN Mobile Money\n"
                            "2. Airtel Money",
-                "ClientState": "%s:%d:%d:%.2f" % (BRANCH_B, state_branch, next_level, parsed_amount),
+                "ClientState": "%s:%d:%d:%.2f" % (BRANCH_A, state_branch, next_level, parsed_amount),
                 "Type": RESPONSE_USSD
             }
         except ValueError:
@@ -41,7 +41,7 @@ def handle_payment_sympathizer(request, level):
 
         return {
             "Message": "Please enter your mobile money phone number",
-            "ClientState": "%s:%d:%d:%.2f:%s" % (BRANCH_B,
+            "ClientState": "%s:%d:%d:%.2f:%s" % (BRANCH_A,
                                                  state_branch,
                                                  next_level,
                                                  float(amount),
