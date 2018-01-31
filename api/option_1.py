@@ -213,13 +213,13 @@ def option_1(request, level):
             network = get_network(new_client_state.split(":")[5])
             payment_number = new_client_state.split(":")[6]
 
-            print((payment_number,
-                   amount,
-                   ussd_number,
-                   network,
-                   selected_id_type,
-                   id_number,
-                   intent))
+            request_payment(payment_number,
+                            amount,
+                            ussd_number,
+                            network,
+                            selected_id_type,
+                            id_number,
+                            intent)
 
             return {
                 "Type": RELEASE_USSD,
@@ -243,7 +243,7 @@ def option_1(request, level):
 
     if level == 8:
         # Executive left
-        if top_choice == "3":
+        if top_choice == "2":
             if len(user_input) != 10:
                 return {
                     "Type": RELEASE_USSD,
@@ -263,17 +263,17 @@ def option_1(request, level):
             network = get_network(new_client_state.split(":")[6])
             payment_number = new_client_state.split(":")[7]
 
-            print((payment_number,
-                   amount,
-                   ussd_number,
-                   network,
-                   selected_id_type,
-                   id_number,
-                   intent))
+            request_payment(payment_number,
+                            amount,
+                            ussd_number,
+                            network,
+                            selected_id_type,
+                            id_number,
+                            intent)
 
             return {
                 "Type": RELEASE_USSD,
                 "Message": "Thank you for initiating dues payment of GHS %.2f."
                            " Please confirm the payment on your mobile money "
-                           "phone shortly."
+                           "phone shortly." % amount
             }
