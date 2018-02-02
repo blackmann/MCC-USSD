@@ -13,7 +13,7 @@ ID_TYPE_MENU = "Please select your ID type:\n\n" \
 ID_NUMBER_SCREEN = "Please enter your %s ID number:\n"
 
 PAYMENT_METHOD_MENU = "Please select payment method type:\n\n" \
-                      "1. MTN Mobile Money" \
+                      "1. MTN Mobile Money\n" \
                       "2. Airtel Money"
 
 PAYMENT_NUMBER_SCREEN = "Please enter your %s number"
