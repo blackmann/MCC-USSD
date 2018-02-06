@@ -207,7 +207,7 @@ def option_1(request, level):
             else:
                 return None
 
-            selected_id_type = ID_TYPES[int(new_client_state.split(":")[3])]
+            selected_id_type = ID_TYPES[int(new_client_state.split(":")[3])-1]
             id_number = new_client_state.split(":")[4]
 
             network = get_network(new_client_state.split(":")[5])
