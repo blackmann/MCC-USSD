@@ -257,7 +257,7 @@ def option_1(request, level):
             amount = executive_level_amount * period[1]
             intent = "Dues - General Member: %s" % period[0]
 
-            selected_id_type = ID_TYPES[int(new_client_state.split(":")[4])]
+            selected_id_type = ID_TYPES[int(new_client_state.split(":")[4])-1]
             id_number = new_client_state.split(":")[5]
 
             network = get_network(new_client_state.split(":")[6])
