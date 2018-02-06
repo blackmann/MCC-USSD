@@ -35,7 +35,7 @@ def option_1(request, level):
         return {
             "Type": RESPONSE_USSD,
             "Message": "Please select an option:\n\n"
-                       "1. General Member (2.00/Month)\n"
+                       "1. General Member (1.00/Month)\n"
                        "2. Party Official\n"
                        "3. Donor (Open)\n",
             "ClientState": BRANCH_A
@@ -58,10 +58,10 @@ def option_1(request, level):
             return {
                 "Type": RESPONSE_USSD,
                 "Message": "Please your level:\n\n"
-                           "1. Branch Executive (2.00/Month)\n"
-                           "2. Constituency Executive (5.00/Month)\n"
-                           "3. Regional Executive (20.00/Month)\n"
-                           "4. National Executive (50.00/Month)\n",
+                           "1. Branch Execut. (2.0/Month)\n"
+                           "2. Constituency Exec. (5.0/Month)\n"
+                           "3. Regional Exec. (20.0/Month)\n"
+                           "4. National Exec. (50.0/Month)\n",
                 "ClientState": new_client_state
             }
 
@@ -196,7 +196,7 @@ def option_1(request, level):
             if top_choice == "1":
                 period_choice = int(new_client_state.split(":")[2]) - 1
                 period = PERIODS[period_choice]
-                amount = 2 * period[1]
+                amount = 1 * period[1]
                 intent = "Dues - General Member: %s" % period[0]
 
             elif top_choice == "3":
