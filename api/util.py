@@ -41,15 +41,13 @@ def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent)
         json_response = response.json()
         access_token = json_response['access_token']
 
-        actual_id = ["Voters", "Membership"][int(id_type) - 1]
-
         request_body = {
             "mobileNumber": mobile_number,
             "source": "USSD",
             "thirdPartyRef": "N/A",
             "amount": amount,
             "parameters": {
-                "ID Type": actual_id,
+                "ID Type": id_type,
                 "ID Number": id_number,
                 "Intent": intent,
                 "USSD Number": ussd_number,
