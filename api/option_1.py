@@ -37,7 +37,7 @@ def option_1(request, level):
             "Message": "Please select an option:\n\n"
                        "1. General Member (1.00/Month)\n"
                        "2. Party Official\n"
-                       "3. Donor (Open)\n",
+                       "3. Bulk Payment\n",
             "ClientState": BRANCH_A
         }
 
@@ -109,12 +109,12 @@ def option_1(request, level):
 
             return {
                 "Type": RESPONSE_USSD,
-                "Message": ID_TYPE_MENU,
+                "Message": "Please specify your constituency\n",
                 "ClientState": new_client_state
             }
 
     if level == 4:
-        if top_choice in ("1", "3",):
+        if top_choice == "1":
             # General Member, Donor
             if not (user_input in (str(a) for a in range(1, 3))):
                 return None
@@ -135,6 +135,13 @@ def option_1(request, level):
             return {
                 "Type": RESPONSE_USSD,
                 "Message": ID_TYPE_MENU,
+                "ClientState": new_client_state
+            }
+
+        if top_choice == "3":
+            return {
+                "Type": RESPONSE_USSD,
+                "Message": "Please enter your polling station name\n",
                 "ClientState": new_client_state
             }
 
@@ -201,13 +208,16 @@ def option_1(request, level):
 
             elif top_choice == "3":
                 amount = float(new_client_state.split(":")[2])
-                intent = "Dues - Donor"
+                intent = "Dues - Bulk Payment"
 
             # safe proof
             else:
                 return None
 
-            selected_id_type = ID_TYPES[int(new_client_state.split(":")[3])-1]
+            selected_id_type = new_client_state.split(":")[3]
+            if top_choice == "1":
+                selected_id_type = ID_TYPES[int(selected_id_type)-1]
+            
             id_number = new_client_state.split(":")[4]
 
             network = get_network(new_client_state.split(":")[5])
