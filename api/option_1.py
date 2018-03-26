@@ -29,6 +29,8 @@ EXECUTIVES_AMOUNTS = [2, 5, 20, 50, ]
 
 ID_TYPES = ["Voters", "Membership", ]
 
+POLLING_CONSTITUENCY = ["Constituency", "Polling Station", ]
+
 
 def option_1(request, level):
     if level == 1:
@@ -109,7 +111,7 @@ def option_1(request, level):
 
             return {
                 "Type": RESPONSE_USSD,
-                "Message": "Please specify your constituency\n",
+                "Message": "Please selection you location type\n1. Constituency\n2. Polling Station\n",
                 "ClientState": new_client_state
             }
 
@@ -139,9 +141,13 @@ def option_1(request, level):
             }
 
         if top_choice == "3":
+            if not (user_input in [str(i) for i in range(1,3)]):
+                return None
+
+            selected = POLLING_CONSTITUENCY[int(user_input)-1]
             return {
                 "Type": RESPONSE_USSD,
-                "Message": "Please enter your polling station name\n",
+                "Message": "Please enter your %s name\n" % selected,
                 "ClientState": new_client_state
             }
 
@@ -214,9 +220,13 @@ def option_1(request, level):
             else:
                 return None
 
-            selected_id_type = new_client_state.split(":")[3]
+            selected_id = new_client_state.split(":")[3]
+            choice_position = int(selected_id)-1
             if top_choice == "1":
-                selected_id_type = ID_TYPES[int(selected_id_type)-1]
+                selected_id_type = ID_TYPES[choice_position]
+
+            if top_choice == "3":
+                selected_id_type = POLLING_CONSTITUENCY[choice_position]
             
             id_number = new_client_state.split(":")[4]
 
