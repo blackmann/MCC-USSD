@@ -111,7 +111,7 @@ def option_1(request, level):
 
             return {
                 "Type": RESPONSE_USSD,
-                "Message": "Please selection you location type\n1. Constituency\n2. Polling Station\n",
+                "Message": "Please select your location type\n1. Constituency\n2. Polling Station\n",
                 "ClientState": new_client_state
             }
 
