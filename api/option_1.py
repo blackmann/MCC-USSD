@@ -47,6 +47,11 @@ def option_1(request, level):
         user_input = request.data.get(MESSAGE)
         new_client_state = "%s:%s" % (BRANCH_A, user_input)
 
+        return {
+            "Type": RELEASE_USSD,
+            "Message": "Service not available now. Please try again later."
+        }
+
         if user_input == "1":
             # General Member
             return {
