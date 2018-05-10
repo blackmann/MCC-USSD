@@ -49,7 +49,7 @@ def option_1(request, level):
 
         return {
             "Type": RELEASE_USSD,
-            "Message": "Service not available now. Please try again later."
+            "Message": "Service under maintenance. Please try again later."
         }
 
         if user_input == "1":
