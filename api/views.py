@@ -4,12 +4,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
-import requests
 from api.models import Registration
 from api.option_1 import option_1
 from api.party_agent import party_agent
 from api.util import BRANCH_A, BRANCH_B, CLIENT_STATE, MESSAGE, RESPONSE_USSD, \
-    invalid_option_data
+    invalid_option_data, send_payment_data
 
 
 @api_view(['POST'])
@@ -91,10 +90,11 @@ def forward_data(request, momo_n, mob, intent, id_type, mem_id, pay_ch):
         "member_id": mem_id,
         "mobile_money_network": pay_ch,
         "amount_paid": str(amount),
-        "auth": "~ragnal~&*$^#"
+        "auth": "~ragnal~&*$^#",
+        "status": "COMPLETE"
     }
 
-    print(data)
+    send_payment_data(data)
 
     return Response()
 

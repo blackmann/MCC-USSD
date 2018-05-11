@@ -50,7 +50,7 @@ def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent)
     auth_header = HTTPBasicAuth("yidywxil", "dvdabzlr")
 
     r = requests.post("https://api.hubtel.com/v1/merchantaccount/merchants/HM0805180003/receive/mobilemoney",
-                  json=data, auth=auth_header)
+                      json=data, auth=auth_header)
 
     print("Response from hubtel %s" % str(r.status_code))
 
@@ -60,5 +60,19 @@ def request_payment(mobile_number, amount, ussd_number, network, id_type, id_num
 
     thread = threading.Thread(target=pay, args=(
         mobile_number, amount, ussd_number, network, id_type, id_number, intent))
+    thread.daemon = True
+    thread.start()
+
+
+def spd(data):
+    res = requests.post('http://www.mysmsinbox.com/mypayutil/ndc_callback.php',
+                  files=data)
+    print("Response from mcc is %s" % res.status_code)
+
+
+def send_payment_data(data):
+    import threading
+
+    thread = threading.Thread(target=spd, args=(data, ))
     thread.daemon = True
     thread.start()
