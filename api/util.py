@@ -42,7 +42,7 @@ def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent)
         "CustomerMsisdn": mobile_number,
         "Channel": network,
         "Amount": amount,
-        "FeesOnCustomer": True,
+        "FeesOnCustomer": False,
         "PrimaryCallbackUrl": callback_url,
         "Description": intent
     }
