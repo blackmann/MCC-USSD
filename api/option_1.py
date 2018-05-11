@@ -34,19 +34,19 @@ POLLING_CONSTITUENCY = ["Constituency", "Polling Station", ]
 
 def option_1(request, level):
     if level == 1:
-        return {
-            "Type": RELEASE_USSD,
-            "Message": "Service under maintenance. Please try again later."
-        }
-
         # return {
-        #     "Type": RESPONSE_USSD,
-        #     "Message": "Please select an option:\n\n"
-        #                "1. General Member (1.00/Month)\n"
-        #                "2. Party Official\n"
-        #                "3. Bulk Payment\n",
-        #     "ClientState": BRANCH_A
+        #     "Type": RELEASE_USSD,
+        #     "Message": "Service under maintenance. Please try again later."
         # }
+
+        return {
+            "Type": RESPONSE_USSD,
+            "Message": "Please select an option:\n\n"
+                       "1. General Member (1.00/Month)\n"
+                       "2. Party Official\n"
+                       "3. Bulk Payment\n",
+            "ClientState": BRANCH_A
+        }
 
     if level == 2:
         user_input = request.data.get(MESSAGE)
