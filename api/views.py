@@ -1,11 +1,15 @@
+import datetime
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
+import requests
 from api.models import Registration
 from api.option_1 import option_1
 from api.party_agent import party_agent
-from api.util import RESPONSE_USSD, MESSAGE, invalid_option_data, BRANCH_A, BRANCH_B, CLIENT_STATE
+from api.util import BRANCH_A, BRANCH_B, CLIENT_STATE, MESSAGE, RESPONSE_USSD, \
+    invalid_option_data
 
 
 @api_view(['POST'])
@@ -66,3 +70,32 @@ def get_registrations(request):
     data = RegistrationSerializer(registrations, many=True).data
 
     return Response(data)
+
+
+@api_view(['POST'])
+def forward_data(request, momo_n, mob, intent, id_type, mem_id, pay_ch):
+    success = request.data['Data']['AmountAfterCharges'] > 0.0
+    s = "false"
+    if success:
+        s = "true"
+
+    amount = request.data['Data']['Amount']
+
+    data = {
+        "when": str(datetime.datetime.now()),
+        "success": s,
+        "mobile_money_number": momo_n,
+        "mobile_number": mob,
+        "intent": intent,
+        "id_type": id_type,
+        "member_id": mem_id,
+        "mobile_money_network": pay_ch,
+        "amount_paid": str(amount),
+        "auth": "~ragnal~&*$^#"
+    }
+
+    print(data)
+
+    return Response()
+
+    
