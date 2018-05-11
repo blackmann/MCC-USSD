@@ -1,4 +1,5 @@
 import requests
+from requests.auth import HTTPBasicAuth
 
 # Notes
 # ClientState is structured in the form 'branching_method':'current_level' then other data
@@ -27,54 +28,37 @@ invalid_option_data = {
 
 
 def get_network(position):
-    return ["mtn", "airtel", "tigo"][int(position) - 1]
+    return ["mtn-gh", "airtel-gh", "tigo-gh"][int(position) - 1]
 
 
 def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
-    response = requests.post("https://payment.mypayutil.com/api/users/authenticate",
-                             data={"mobileNumber": "0000000006",
-                                   "password": "memberReg#Newdeveloper5"})
+    callback_url = "https://mcc-ussd-1.herokuapp.com/%s/%s/%s/%s/%s/%s/" % (
+        mobile_number, ussd_number, intent.replace(
+            " ", "-"), id_type.replace(" ", "-"), id_number.replace(" ", "-"), network
+    )
 
-    print("[Request Payment] Authenticating...")
-    if str(response.status_code).startswith("20"):
-        print("Authentication done, success")
-        json_response = response.json()
-        access_token = json_response['access_token']
+    data = {
+        "CustomerName": "Member:%s" % id_number,
+        "CustomerMsisdn": mobile_number,
+        "Channel": network,
+        "Amount": amount,
+        "FeesOnCustomer": True,
+        "PrimaryCallbackUrl": callback_url,
+        "Description": intent
+    }
 
-        request_body = {
-            "mobileNumber": mobile_number,
-            "source": "USSD",
-            "thirdPartyRef": "N/A",
-            "amount": amount,
-            "parameters": {
-                "ID Type": id_type,
-                "ID Number": id_number,
-                "Intent": intent,
-                "USSD Number": ussd_number,
-            },
-            "service": "5a12c32e2adb093f1c8bf0f4"
-        }
+    auth_header = HTTPBasicAuth("yidywxil", "dvdabzlr")
 
-        print(request_body)
-        print(network)
+    r = requests.post("https://api.hubtel.com/v1/merchantaccount/merchants/HM0805180003/receive/mobilemoney",
+                  json=data, auth=auth_header)
 
-        headers = {
-            "Authorization": "Bearer %s" % access_token
-        }
-
-        res = requests.post("https://payment.mypayutil.com/api/merchants/payments/%s" % network,
-                            json=request_body,
-                            headers=headers)
-
-        print("Request made %d %s" % (res.status_code, res.text,))
-
-    else:
-        print("Failed %d" % response.status_code)
+    print("Response from hubtel %s" % str(r.status_code))
 
 
 def request_payment(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
     import threading
 
-    thread = threading.Thread(target=pay, args=(mobile_number, amount, ussd_number, network, id_type, id_number, intent))
+    thread = threading.Thread(target=pay, args=(
+        mobile_number, amount, ussd_number, network, id_type, id_number, intent))
     thread.daemon = True
     thread.start()
