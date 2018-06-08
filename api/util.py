@@ -28,10 +28,10 @@ invalid_option_data = {
 
 
 def get_network(position):
-    return ["mtn-gh", "airtel-gh", "tigo-gh"][int(position) - 1]
+    return ["mtn-gh", "airtel-gh", "vodafone-gh"][int(position) - 1]
 
 
-def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
+def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent, token=None):
     callback_url = "https://mcc-ussd-1.herokuapp.com/%s/%s/%s/%s/%s/%s/" % (
         mobile_number, ussd_number, intent.replace(
             " ", "-"), id_type.replace(" ", "-"), id_number.replace(" ", "-"), network
@@ -44,7 +44,8 @@ def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent)
         "Amount": amount,
         "FeesOnCustomer": False,
         "PrimaryCallbackUrl": callback_url,
-        "Description": intent
+        "Description": intent,
+        "Token": token
     }
 
     auth_header = HTTPBasicAuth("yidywxil", "dvdabzlr")
@@ -55,11 +56,11 @@ def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent)
     print("Response from hubtel %s" % str(r.status_code))
 
 
-def request_payment(mobile_number, amount, ussd_number, network, id_type, id_number, intent):
+def request_payment(mobile_number, amount, ussd_number, network, id_type, id_number, intent, token=None):
     import threading
 
     thread = threading.Thread(target=pay, args=(
-        mobile_number, amount, ussd_number, network, id_type, id_number, intent))
+        mobile_number, amount, ussd_number, network, id_type, id_number, intent, token))
     thread.daemon = True
     thread.start()
 

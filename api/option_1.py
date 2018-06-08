@@ -14,7 +14,8 @@ ID_NUMBER_SCREEN = "Please enter your %s ID number:\n"
 
 PAYMENT_METHOD_MENU = "Please select payment method type:\n\n" \
                       "1. MTN Mobile Money\n" \
-                      "2. Airtel Money"
+                      "2. Airtel Money \n" \
+                      "3. Vodafone Cash"
 
 PAYMENT_NUMBER_SCREEN = "Please enter your %s number"
 
@@ -146,7 +147,7 @@ def option_1(request, level):
             }
 
         if top_choice == "3":
-            if not (user_input in [str(i) for i in range(1,3)]):
+            if not (user_input in [str(i) for i in range(1, 3)]):
                 return None
 
             selected = POLLING_CONSTITUENCY[int(user_input)-1]
@@ -182,10 +183,11 @@ def option_1(request, level):
     if level == 6:
         if top_choice in ("1", "3",):
             # General Member, Donor
-            if not (user_input in (str(a) for a in range(1, 3))):
+            if not (user_input in (str(a) for a in range(1, 4))):
                 return None
 
-            payment_type = ["MTN Mobile Money", "Airtel Money"][int(user_input) - 1]
+            payment_type = ["MTN Mobile Money", "Airtel Money",
+                            "Vodafone Cash"][int(user_input) - 1]
 
             return {
                 "Type": RESPONSE_USSD,
@@ -210,6 +212,14 @@ def option_1(request, level):
                     "Message": "The phone number you provided should be 10 digits. Please try again!",
                 }
 
+            network = get_network(new_client_state.split(":")[5])
+            if network == 'vodafone-gh':
+                return {
+                    "Type": RESPONSE_USSD,
+                    "Message": "Please provide the Vodafone cash token for this transaction",
+                    "ClientState": new_client_state
+                }
+
             # do calculations
             if top_choice == "1":
                 period_choice = int(new_client_state.split(":")[2]) - 1
@@ -232,10 +242,9 @@ def option_1(request, level):
 
             if top_choice == "3":
                 selected_id_type = POLLING_CONSTITUENCY[choice_position]
-            
+
             id_number = new_client_state.split(":")[4]
 
-            network = get_network(new_client_state.split(":")[5])
             payment_number = new_client_state.split(":")[6]
 
             request_payment(payment_number,
@@ -255,10 +264,11 @@ def option_1(request, level):
 
         if top_choice == "2":
             # Executive
-            if not (user_input in (str(a) for a in range(1, 3))):
+            if not (user_input in (str(a) for a in range(1, 4))):
                 return None
 
-            payment_type = ["MTN Mobile Money", "Airtel Money"][int(user_input) - 1]
+            payment_type = ["MTN Mobile Money", "Airtel Money",
+                            "Vodafone Cash"][int(user_input) - 1]
 
             return {
                 "Type": RESPONSE_USSD,
@@ -275,10 +285,102 @@ def option_1(request, level):
                     "Message": "The phone number you provided should be 10 digits. Please try again!",
                 }
 
+            network = get_network(new_client_state.split(":")[6])
+            if network == 'vodafone-gh':
+                return {
+                    "Type": RESPONSE_USSD,
+                    "Message": "Please provide the Vodafone cash token for this transaction",
+                    "ClientState": new_client_state
+                }
+
             # do calculations
             period_choice = int(new_client_state.split(":")[3]) - 1
             period = PERIODS[period_choice]
-            executive_level_amount = EXECUTIVES_AMOUNTS[int(new_client_state.split(":")[3]) - 1]
+            executive_level_amount = EXECUTIVES_AMOUNTS[int(
+                new_client_state.split(":")[3]) - 1]
+            amount = executive_level_amount * period[1]
+            intent = "Dues - General Member: %s" % period[0]
+
+            selected_id_type = ID_TYPES[int(new_client_state.split(":")[4])-1]
+            id_number = new_client_state.split(":")[5]
+
+            payment_number = new_client_state.split(":")[7]
+
+            request_payment(payment_number,
+                            amount,
+                            ussd_number,
+                            network,
+                            selected_id_type,
+                            id_number,
+                            intent)
+
+            return {
+                "Type": RELEASE_USSD,
+                "Message": "Thank you for initiating dues payment of GHS %.2f."
+                           " Please confirm the payment on your mobile money "
+                           "phone shortly." % amount
+            }
+
+        if top_choice in ("1", "3",):
+            print("here")
+            # vodafone case
+            # do calculations
+            if top_choice == "1":
+                period_choice = int(new_client_state.split(":")[2]) - 1
+                period = PERIODS[period_choice]
+                amount = 1 * period[1]
+                intent = "Dues - General Member: %s" % period[0]
+
+            elif top_choice == "3":
+                amount = float(new_client_state.split(":")[2])
+                intent = "Dues - Bulk Payment"
+
+            # safe proof
+            else:
+                return None
+
+            selected_id = new_client_state.split(":")[3]
+            choice_position = int(selected_id)-1
+            if top_choice == "1":
+                selected_id_type = ID_TYPES[choice_position]
+
+            if top_choice == "3":
+                selected_id_type = POLLING_CONSTITUENCY[choice_position]
+
+            id_number = new_client_state.split(":")[4]
+
+            network = get_network(new_client_state.split(":")[5])
+            payment_number = new_client_state.split(":")[6]
+
+            transaction_token = user_input
+
+            request_payment(payment_number,
+                            amount,
+                            ussd_number,
+                            network,
+                            selected_id_type,
+                            id_number,
+                            intent,
+                            transaction_token)
+            
+            return {
+                "Type": RELEASE_USSD,
+                "Message": "Thank you for initiating dues payment of GHS %.2f."
+                           " Please confirm the payment on your mobile money "
+                           "phone shortly." % amount
+            }
+            
+
+    if level == 9:
+        # vodafone last case
+        if top_choice == "2":
+            transaction_token = user_input
+
+            # do calculations
+            period_choice = int(new_client_state.split(":")[3]) - 1
+            period = PERIODS[period_choice]
+            executive_level_amount = EXECUTIVES_AMOUNTS[int(
+                new_client_state.split(":")[3]) - 1]
             amount = executive_level_amount * period[1]
             intent = "Dues - General Member: %s" % period[0]
 
@@ -294,7 +396,8 @@ def option_1(request, level):
                             network,
                             selected_id_type,
                             id_number,
-                            intent)
+                            intent,
+                            transaction_token)
 
             return {
                 "Type": RELEASE_USSD,
