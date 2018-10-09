@@ -48,7 +48,7 @@ def pay(mobile_number, amount, ussd_number, network, id_type, id_number, intent,
         "Token": token
     }
 
-    auth_header = HTTPBasicAuth("yidywxil", "dvdabzlr")
+    auth_header = HTTPBasicAuth("fhojqavg", "rgbekrne")
 
     r = requests.post("https://api.hubtel.com/v1/merchantaccount/merchants/HM0805180003/receive/mobilemoney",
                       json=data, auth=auth_header)
